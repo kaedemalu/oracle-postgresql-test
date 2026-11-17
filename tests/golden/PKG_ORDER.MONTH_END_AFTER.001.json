@@ -1,0 +1,27 @@
+{
+  "case_id": "PKG_ORDER.MONTH_END_AFTER.001",
+  "case_hash": "sha256:3f88d774c941661017bb12437c34f30bfb5f7d10cae79772e5cb3cbe3906c859",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "return": {
+      "type": "DATE",
+      "value": "2026-02-28T10:30:00"
+    },
+    "out_args": {},
+    "result_sets": {},
+    "error": null
+  }
+}

@@ -1,0 +1,47 @@
+suite: PKG_ORDER
+defaults:
+  target: {kind: function, name: PKG_ORDER.MONTH_END_AFTER}
+  call:
+    returns: {type: DATE}
+
+cases:
+  - id: PKG_ORDER.MONTH_END_AFTER.001
+    title: 翌月末(時刻を保持)
+    tags: [dialect]
+    priority: high
+    call:
+      args:
+        - {name: P_DATE, type: DATE, value: "2026-01-15T10:30:00"}
+        - {name: P_MONTHS, type: NUMBER, value: 1}
+
+  - id: PKG_ORDER.MONTH_END_AFTER.002
+    title: うるう年の 2 月
+    tags: [dialect, boundary]
+    call:
+      args:
+        - {name: P_DATE, type: DATE, value: "2024-01-31T00:00:00"}
+        - {name: P_MONTHS, type: NUMBER, value: 1}
+
+  - id: PKG_ORDER.MONTH_END_AFTER.003
+    title: 負の月数・年跨ぎ
+    tags: [dialect, boundary]
+    call:
+      args:
+        - {name: P_DATE, type: DATE, value: "2026-01-31T23:59:59"}
+        - {name: P_MONTHS, type: NUMBER, value: -1}
+
+  - id: PKG_ORDER.MONTH_END_AFTER.004
+    title: 小数の月数(ADD_MONTHS は切り捨て)
+    tags: [dialect, boundary]
+    call:
+      args:
+        - {name: P_DATE, type: DATE, value: "2026-03-10T00:00:00"}
+        - {name: P_MONTHS, type: NUMBER, value: "1.5"}
+
+  - id: PKG_ORDER.MONTH_END_AFTER.005
+    title: NULL 日付
+    tags: ["null"]
+    call:
+      args:
+        - {name: P_DATE, type: DATE, value: null}
+        - {name: P_MONTHS, type: NUMBER, value: 1}

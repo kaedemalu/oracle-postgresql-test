@@ -1,0 +1,27 @@
+{
+  "case_id": "PKG_ORDER.FORMAT_NAME.002",
+  "case_hash": "sha256:3436a8f211e4a02016f3bea0e0bae91a097566ec90e7ae04e352d575ac734c68",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "return": {
+      "type": "VARCHAR",
+      "value": "山田"
+    },
+    "out_args": {},
+    "result_sets": {},
+    "error": null
+  }
+}

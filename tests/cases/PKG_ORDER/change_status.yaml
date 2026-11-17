@@ -1,0 +1,35 @@
+suite: PKG_ORDER
+defaults:
+  clock: "2026-02-01T09:00:00"
+  observe_scope: [ORDERS, AUDIT_LOG]
+  target: {kind: procedure, name: PKG_ORDER.CHANGE_STATUS}
+  setup:
+    fixtures: [base_master]
+    rows:
+      - table: ORDERS
+        data:
+          - {ID: 1, CUSTOMER_ID: 1, AMOUNT: 1000, TAX: 100, STATUS: NEW, ORDER_DATE: "2026-01-10T12:00:00"}
+  observe:
+    snapshot:
+      ignore_columns:
+        ORDERS: [UPDATED_AT]
+
+cases:
+  - id: PKG_ORDER.CHANGE_STATUS.001
+    title: ステータス更新(監査ログに UPDATE が残る)
+    tags: [trigger, regression]
+    priority: high
+    call:
+      args:
+        - {name: P_ORDER_ID, type: INTEGER, value: 1}
+        - {name: P_STATUS, value: SHIPPED}
+
+  - id: PKG_ORDER.CHANGE_STATUS.002
+    title: 対象なし(SQL%ROWCOUNT = 0 → -20002)
+    tags: [error]
+    priority: high
+    call:
+      args:
+        - {name: P_ORDER_ID, type: INTEGER, value: 99}
+        - {name: P_STATUS, value: SHIPPED}
+    error: {compare: name_and_message}

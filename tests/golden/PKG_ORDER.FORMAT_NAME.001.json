@@ -1,0 +1,27 @@
+{
+  "case_id": "PKG_ORDER.FORMAT_NAME.001",
+  "case_hash": "sha256:6c89eba3c261d6f2123a43e17a341f6006e66919ab39b79a324ceb6c1bb23ebe",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "return": {
+      "type": "VARCHAR",
+      "value": "山田 太郎"
+    },
+    "out_args": {},
+    "result_sets": {},
+    "error": null
+  }
+}

@@ -1,0 +1,17 @@
+[project]
+name = "ora-pg-dual-test"
+version = "0.1.0"
+description = "PL/SQL ⇔ PL/pgSQL 二刀流検証テスト基盤"
+requires-python = ">=3.11"
+dependencies = [
+  "pytest>=8.0",
+  "pydantic>=2.6",
+  "PyYAML>=6.0",
+  "oracledb>=2.0",
+  "psycopg[binary]>=3.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-p no:cacheprovider -ra"

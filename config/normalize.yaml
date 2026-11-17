@@ -1,0 +1,19 @@
+# 正規化ルール(9章)
+string:
+  nfc: true              # Unicode NFC 正規化
+  unify_newlines: true   # \r\n / \r → \n
+  rstrip_char: true      # CHAR 型の末尾パディング除去
+empty_string_as_null: true   # '' と NULL を同一視(5.7)。ケースの strict_empty で上書き
+datetime:
+  precision: second      # second / microsecond
+  timezone: UTC
+boolean:
+  true_values: ["1", "Y", "T", "TRUE"]
+  false_values: ["0", "N", "F", "FALSE"]
+float:
+  digits: 15             # 浮動小数点は有効桁数で丸めて文字列化
+
+# 列単位の上書き。table / column は glob(大文字)。mask: SEQ / NOW / GUID / 任意文字列
+columns:
+  - {table: "*", column: "*_GUID", mask: GUID}
+  # - {table: ORDERS, column: IS_PAID, type: BOOLEAN}

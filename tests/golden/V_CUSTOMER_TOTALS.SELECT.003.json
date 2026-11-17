@@ -1,0 +1,44 @@
+{
+  "case_id": "V_CUSTOMER_TOTALS.SELECT.003",
+  "case_hash": "sha256:5d363342c487e8c624d26c193b906d11c0ef67119d598e1b5344f8969610efa8",
+  "recorded_at": "2026-11-16T10:49:26Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "out_args": {},
+    "result_sets": {
+      "QUERY": {
+        "columns": [
+          {
+            "name": "NAME",
+            "type": "VARCHAR"
+          }
+        ],
+        "ordered": true,
+        "rows": [
+          [
+            "Suzuki Ltd."
+          ],
+          [
+            "山本工業"
+          ],
+          [
+            "山田商事"
+          ]
+        ]
+      }
+    },
+    "error": null
+  }
+}

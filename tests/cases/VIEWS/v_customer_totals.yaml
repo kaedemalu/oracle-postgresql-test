@@ -1,0 +1,29 @@
+suite: V_CUSTOMER_TOTALS
+defaults:
+  target: {kind: sql}
+  setup:
+    fixtures: [base_master]
+  query: "SELECT ID, NAME, ORDER_COUNT, TOTAL_AMOUNT FROM V_CUSTOMER_TOTALS"
+
+cases:
+  - id: V_CUSTOMER_TOTALS.SELECT.001
+    title: 外部結合(注文なし顧客は 0 件・0 円)
+    tags: [dialect]
+    setup:
+      rows:
+        - table: ORDERS
+          data:
+            - {ID: 1, CUSTOMER_ID: 1, AMOUNT: "100.10", STATUS: NEW}
+            - {ID: 2, CUSTOMER_ID: 1, AMOUNT: "200.20", STATUS: NEW}
+
+  - id: V_CUSTOMER_TOTALS.SELECT.002
+    title: 注文 0 件
+    tags: [dialect, boundary]
+
+  - id: V_CUSTOMER_TOTALS.SELECT.003
+    title: DB 別 SQL(ORDER BY 込みで順序比較)
+    tags: [dialect]
+    observe: {ordered: true}
+    query:
+      oracle: "SELECT NAME FROM V_CUSTOMER_TOTALS ORDER BY NLSSORT(NAME, 'NLS_SORT=BINARY')"
+      postgres: "SELECT name FROM v_customer_totals ORDER BY name COLLATE \"C\""

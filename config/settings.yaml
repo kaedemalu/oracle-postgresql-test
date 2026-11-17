@@ -1,0 +1,64 @@
+# 接続先・実行オプション。認証情報は環境変数から注入する(${VAR} / ${VAR:-default})
+databases:
+  oracle:
+    host: ${ORACLE_HOST:-localhost}
+    port: ${ORACLE_PORT:-1521}
+    service: ${ORACLE_SERVICE:-FREEPDB1}
+    user: ${ORACLE_USER:-app}
+    password: ${ORACLE_PASSWORD}
+    # セッション固定(6.4)
+    session:
+      NLS_DATE_FORMAT: "YYYY-MM-DD HH24:MI:SS"
+      NLS_TIMESTAMP_FORMAT: "YYYY-MM-DD HH24:MI:SS.FF6"
+      NLS_NUMERIC_CHARACTERS: ".,"
+      NLS_SORT: BINARY
+      NLS_COMP: BINARY
+      TIME_ZONE: UTC
+  postgres:
+    host: ${POSTGRES_HOST:-localhost}
+    port: ${POSTGRES_PORT:-5432}
+    dbname: ${POSTGRES_DB:-app}
+    user: ${POSTGRES_USER:-app}
+    password: ${POSTGRES_PASSWORD}
+    session:
+      TimeZone: UTC
+      DateStyle: "ISO, YMD"
+      search_path: "app, public"
+      standard_conforming_strings: "on"
+      client_min_messages: notice
+
+# 本番 DB への接続禁止(15.4): ここに無いホストへは接続しない
+allowed_hosts: [localhost, 127.0.0.1, oracle, postgres]
+
+# DB スクリプト(tools/deploy.py が名前順に適用)
+deploy:
+  oracle: db/oracle
+  postgres: db/postgres
+
+# 名前解決(5.5)。規則: Oracle はそのまま大文字、PostgreSQL は小文字(スキーマ方式)
+naming:
+  postgres: lower
+name_mapping: {}
+#  PKG_ORDER.CALC_TAX:
+#    oracle: PKG_ORDER.CALC_TAX
+#    postgres: pkg_order.calc_tax
+
+# 時刻注入(5.6)。採用方式: ラッパ関数差し替え
+clock:
+  oracle: "BEGIN APP_CLOCK.SET_FIXED(:ts); END;"
+  postgres: "SELECT app_clock.set_fixed(%(ts)s::timestamp)"
+
+# リセット(7章)。ケース開始前に削除(子→親の順)し、シーケンスを既知値に初期化する
+reset:
+  tables: [AUDIT_LOG, ORDERS, CUSTOMERS]
+  sequences: {ORDER_SEQ: 1, AUDIT_SEQ: 1}
+
+paths:
+  cases: tests/cases
+  fixtures: tests/fixtures
+  golden: tests/golden
+  reports: reports
+  ledger: ledger/diff_ledger.csv
+  error_map: config/error_map.yaml
+  normalize: config/normalize.yaml
+  tolerances: config/tolerances.yaml

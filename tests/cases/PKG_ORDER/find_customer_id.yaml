@@ -1,0 +1,40 @@
+suite: PKG_ORDER
+defaults:
+  target: {kind: function, name: PKG_ORDER.FIND_CUSTOMER_ID}
+  setup:
+    fixtures: [base_master]
+  call:
+    returns: {type: INTEGER}
+
+cases:
+  - id: PKG_ORDER.FIND_CUSTOMER_ID.001
+    title: 1 件ヒット
+    tags: [dialect]
+    call:
+      args: [{name: P_NAME_PREFIX, value: 山田}]
+
+  - id: PKG_ORDER.FIND_CUSTOMER_ID.002
+    title: 0 件(SELECT INTO → NO_DATA_FOUND)
+    tags: [dialect, error]
+    priority: high
+    call:
+      args: [{name: P_NAME_PREFIX, value: 存在しない}]
+
+  - id: PKG_ORDER.FIND_CUSTOMER_ID.003
+    title: 複数件(SELECT INTO → TOO_MANY_ROWS)
+    tags: [dialect, error]
+    priority: high
+    call:
+      args: [{name: P_NAME_PREFIX, value: 山}]
+
+  - id: PKG_ORDER.FIND_CUSTOMER_ID.004
+    title: NULL(Oracle は NULL || '%' = '%' で全件一致)
+    tags: [dialect, "null", error]
+    call:
+      args: [{name: P_NAME_PREFIX, value: null}]
+
+  - id: PKG_ORDER.FIND_CUSTOMER_ID.005
+    title: 空文字
+    tags: [dialect, empty, error]
+    call:
+      args: [{name: P_NAME_PREFIX, value: ""}]

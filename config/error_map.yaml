@@ -1,0 +1,27 @@
+# 例外対応表(10章)。多対一可。postgres 側は code に加え message_regex で判別できる
+errors:
+  - {name: ERR_NO_DATA,           oracle: [ORA-01403], postgres: [P0002]}
+  - {name: ERR_TOO_MANY_ROWS,     oracle: [ORA-01422], postgres: [P0003]}
+  - {name: ERR_UNIQUE,            oracle: [ORA-00001], postgres: ["23505"]}
+  - name: ERR_FK_PARENT_MISSING
+    oracle: [ORA-02291]
+    postgres: [{code: "23503", message_regex: "^insert or update on table"}]
+  - name: ERR_FK_CHILD_EXISTS
+    oracle: [ORA-02292]
+    postgres: [{code: "23503", message_regex: "^update or delete on table"}]
+  - {name: ERR_NOT_NULL,          oracle: [ORA-01400, ORA-01407], postgres: ["23502"]}
+  - {name: ERR_CHECK,             oracle: [ORA-02290], postgres: ["23514"]}
+  - {name: ERR_VALUE_TOO_LARGE,   oracle: [ORA-12899], postgres: ["22001"]}
+  - {name: ERR_NUMERIC_OVERFLOW,  oracle: [ORA-01438, ORA-01426], postgres: ["22003"]}
+  - {name: ERR_INVALID_NUMBER,    oracle: [ORA-01722, ORA-06502], postgres: ["22P02"]}
+  - {name: ERR_DIVIDE_BY_ZERO,    oracle: [ORA-01476], postgres: ["22012"]}
+  - {name: ERR_DEADLOCK,          oracle: [ORA-00060], postgres: [40P01]}
+
+# ユーザー定義例外(10.2)。論理名は ERR_USER_<Oracle のエラー番号>
+user_errors:
+  oracle_range: [20000, 20999]
+  postgres:
+    # 規約: ERRCODE 'U0nnn' ⇔ ORA-20nnn
+    - {code_regex: "^U0(\\d{3})$", number: "20{1}"}
+    # 互換: P0001 + メッセージ先頭に "ORA-20nnn:" / "[20nnn]" を含める方式
+    - {code_regex: "^P0001$", message_regex: "^(?:ORA-|\\[)(20\\d{3})", number: "{1}"}

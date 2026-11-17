@@ -1,0 +1,55 @@
+suite: PKG_ORDER
+defaults:
+  target: {kind: function, name: PKG_ORDER.FORMAT_NAME}
+  call:
+    returns: {type: VARCHAR}
+
+cases:
+  - id: PKG_ORDER.FORMAT_NAME.001
+    title: 姓名の連結
+    tags: [dialect]
+    call:
+      args:
+        - {name: P_LAST, value: 山田}
+        - {name: P_FIRST, value: 太郎}
+
+  - id: PKG_ORDER.FORMAT_NAME.002
+    title: 名が NULL(Oracle の || は NULL を空文字扱い)
+    tags: [dialect, "null"]
+    priority: high
+    call:
+      args:
+        - {name: P_LAST, value: 山田}
+        - {name: P_FIRST, value: null}
+
+  - id: PKG_ORDER.FORMAT_NAME.003
+    title: 姓が空文字
+    tags: [dialect, empty]
+    call:
+      args:
+        - {name: P_LAST, value: ""}
+        - {name: P_FIRST, value: 太郎}
+
+  - id: PKG_ORDER.FORMAT_NAME.004
+    title: 両方空文字(PostgreSQL は '' を返す → 警告)
+    tags: [dialect, empty]
+    call:
+      args:
+        - {name: P_LAST, value: ""}
+        - {name: P_FIRST, value: ""}
+
+  - id: PKG_ORDER.FORMAT_NAME.005
+    title: サロゲートペア・半角カナ
+    tags: [dialect]
+    call:
+      args:
+        - {name: P_LAST, value: "𠮷野"}
+        - {name: P_FIRST, value: "ﾀﾛｳ"}
+
+  - id: PKG_ORDER.FORMAT_NAME.006
+    title: 空白のみ
+    tags: [dialect, boundary]
+    call:
+      args:
+        - {name: P_LAST, value: "   "}
+        - {name: P_FIRST, value: "x"}

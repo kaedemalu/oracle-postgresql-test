@@ -1,0 +1,5 @@
+-- 既存オブジェクトを全削除(テスト用DB専用。本番では実行しないこと)
+DROP SCHEMA IF EXISTS pkg_order CASCADE;
+DROP SCHEMA IF EXISTS app_clock CASCADE;
+DROP SCHEMA IF EXISTS app CASCADE;
+CREATE SCHEMA app;

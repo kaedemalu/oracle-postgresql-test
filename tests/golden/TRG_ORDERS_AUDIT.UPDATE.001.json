@@ -1,0 +1,125 @@
+{
+  "case_id": "TRG_ORDERS_AUDIT.UPDATE.001",
+  "case_hash": "sha256:45da895cdd9350efb077957f93cb438658459fa6b68dba67582b99cfda0398f1",
+  "recorded_at": "2026-11-16T10:49:47Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "out_args": {},
+    "result_sets": {},
+    "error": null,
+    "snapshot": {
+      "AUDIT_LOG": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ORDER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ACTION",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "OLD_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NEW_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "LOGGED_AT",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": [
+          [
+            "1",
+            "10",
+            "INSERT",
+            null,
+            "NEW",
+            "2026-03-01T08:00:00"
+          ],
+          [
+            "2",
+            "10",
+            "UPDATE",
+            "NEW",
+            "PAID",
+            "2026-03-01T08:00:00"
+          ]
+        ]
+      },
+      "ORDERS": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "CUSTOMER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "AMOUNT",
+            "type": "NUMBER"
+          },
+          {
+            "name": "TAX",
+            "type": "NUMBER"
+          },
+          {
+            "name": "STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NOTE",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "ORDER_DATE",
+            "type": "DATE"
+          },
+          {
+            "name": "UPDATED_AT",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": [
+          [
+            "10",
+            "1",
+            "100",
+            null,
+            "PAID",
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    }
+  }
+}

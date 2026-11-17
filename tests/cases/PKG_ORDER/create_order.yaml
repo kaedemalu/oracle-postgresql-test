@@ -1,0 +1,106 @@
+suite: PKG_ORDER
+defaults:
+  clock: "2026-01-15T10:00:00"
+  observe_scope: [ORDERS, AUDIT_LOG]
+  target: {kind: procedure, name: PKG_ORDER.CREATE_ORDER}
+  setup:
+    fixtures: [base_master]
+  observe:
+    messages: true
+    snapshot:
+      ignore_columns:
+        ORDERS: [UPDATED_AT]
+
+cases:
+  - id: PKG_ORDER.CREATE_ORDER.001
+    title: 正常登録(OUT 引数・事後状態・トリガ・DBMS_OUTPUT)
+    tags: [regression]
+    priority: high
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 1}
+        - {name: P_AMOUNT, type: NUMBER, value: 1000}
+        - {name: P_NOTE, value: 初回注文}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}
+
+  - id: PKG_ORDER.CREATE_ORDER.002
+    title: 備考が空文字(PostgreSQL は '' を保存 → 警告)
+    tags: [empty, dialect]
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 2}
+        - {name: P_AMOUNT, type: NUMBER, value: "10.5"}
+        - {name: P_NOTE, value: ""}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}
+
+  - id: PKG_ORDER.CREATE_ORDER.003
+    title: 存在しない顧客(FK 親無し)
+    tags: [error]
+    priority: high
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 999}
+        - {name: P_AMOUNT, type: NUMBER, value: 1000}
+        - {name: P_NOTE, value: x}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}
+
+  - id: PKG_ORDER.CREATE_ORDER.004
+    title: 負の金額(CALC_TAX のユーザー定義例外が伝播)
+    tags: [error]
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 1}
+        - {name: P_AMOUNT, type: NUMBER, value: -100}
+        - {name: P_NOTE, value: x}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}
+    error: {compare: name_and_message}
+
+  - id: PKG_ORDER.CREATE_ORDER.005
+    title: 金額 NULL(NOT NULL 違反)
+    tags: [error, "null"]
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 1}
+        - {name: P_AMOUNT, type: NUMBER, value: null}
+        - {name: P_NOTE, value: x}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}
+
+  - id: PKG_ORDER.CREATE_ORDER.006
+    title: 備考が桁あふれ(101 文字)
+    tags: [error, boundary]
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 1}
+        - {name: P_AMOUNT, type: NUMBER, value: 1}
+        - {name: P_NOTE, value: "あいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこあいうえおかきくけこX"}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}
+
+  - id: PKG_ORDER.CREATE_ORDER.007
+    title: COMMIT 後に別セッションから観測
+    tags: [regression]
+    transaction: {commit_after_call: true, observe_from: other_session}
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 3}
+        - {name: P_AMOUNT, type: NUMBER, value: 5000}
+        - {name: P_NOTE, value: null}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}
+
+  - id: PKG_ORDER.CREATE_ORDER.008
+    title: 未 COMMIT は別セッションから見えない
+    tags: [regression]
+    transaction: {commit_after_call: false, observe_from: other_session}
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 3}
+        - {name: P_AMOUNT, type: NUMBER, value: 5000}
+        - {name: P_NOTE, value: null}
+        - {name: P_ORDER_ID, type: INTEGER, mode: OUT}
+        - {name: P_TAX, type: NUMBER, mode: OUT}

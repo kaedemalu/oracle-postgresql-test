@@ -1,0 +1,27 @@
+{
+  "case_id": "PKG_ORDER.CALC_TAX.002",
+  "case_hash": "sha256:89f9707e99cf9bb55eeadaad69197154d0cb3ee1acb573a71009fe9b5b1de55e",
+  "recorded_at": "2026-11-16T10:49:23Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "return": {
+      "type": "NUMBER",
+      "value": "123"
+    },
+    "out_args": {},
+    "result_sets": {},
+    "error": null
+  }
+}

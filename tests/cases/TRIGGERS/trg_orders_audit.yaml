@@ -1,0 +1,69 @@
+suite: TRG_ORDERS_AUDIT
+defaults:
+  clock: "2026-03-01T08:00:00"
+  observe_scope: [ORDERS, AUDIT_LOG]
+  target: {kind: trigger}
+  setup:
+    fixtures: [base_master]
+  observe:
+    snapshot: {}
+
+cases:
+  - id: TRG_ORDERS_AUDIT.INSERT.001
+    title: INSERT で監査ログ作成
+    tags: [trigger]
+    priority: high
+    fire:
+      table: ORDERS
+      op: insert
+      data:
+        - {ID: 10, CUSTOMER_ID: 1, AMOUNT: 100, STATUS: NEW}
+        - {ID: 11, CUSTOMER_ID: 2, AMOUNT: 200, STATUS: HOLD}
+
+  - id: TRG_ORDERS_AUDIT.UPDATE.001
+    title: STATUS 更新で監査ログ作成(旧値・新値)
+    tags: [trigger]
+    setup:
+      rows:
+        - table: ORDERS
+          data: [{ID: 10, CUSTOMER_ID: 1, AMOUNT: 100, STATUS: NEW}]
+    fire: {table: ORDERS, op: update, set: {STATUS: PAID}, where: {ID: 10}}
+
+  - id: TRG_ORDERS_AUDIT.UPDATE.002
+    title: STATUS 以外の更新ではトリガ不発
+    tags: [trigger]
+    setup:
+      rows:
+        - table: ORDERS
+          data: [{ID: 10, CUSTOMER_ID: 1, AMOUNT: 100, STATUS: NEW}]
+    fire: {table: ORDERS, op: update, set: {AMOUNT: 150}, where: {ID: 10}}
+
+  - id: TRG_ORDERS_AUDIT.CHECK.001
+    title: CHECK 制約違反(負の金額)
+    tags: [trigger, error]
+    fire:
+      table: ORDERS
+      op: insert
+      data: [{ID: 10, CUSTOMER_ID: 1, AMOUNT: -1, STATUS: NEW}]
+
+  - id: TRG_ORDERS_AUDIT.FK.001
+    title: 子レコードのある顧客の削除(FK 子有り)
+    tags: [error]
+    target: {kind: trigger}
+    setup:
+      rows:
+        - table: ORDERS
+          data: [{ID: 10, CUSTOMER_ID: 1, AMOUNT: 100, STATUS: NEW}]
+    fire: {table: CUSTOMERS, op: delete, where: {ID: 1}}
+
+  - id: TRG_ORDERS_AUDIT.UNIQUE.001
+    title: 主キー重複
+    tags: [error]
+    setup:
+      rows:
+        - table: ORDERS
+          data: [{ID: 10, CUSTOMER_ID: 1, AMOUNT: 100, STATUS: NEW}]
+    fire:
+      table: ORDERS
+      op: insert
+      data: [{ID: 10, CUSTOMER_ID: 2, AMOUNT: 1, STATUS: NEW}]

@@ -1,0 +1,105 @@
+{
+  "case_id": "PKG_ORDER.CREATE_ORDER.008",
+  "case_hash": "sha256:ea2bfb6345127eb5693dc5c93e8aaeccd68517b7571183aa85be906fb4005c26",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "out_args": {
+      "P_ORDER_ID": {
+        "type": "INTEGER",
+        "value": "1"
+      },
+      "P_TAX": {
+        "type": "NUMBER",
+        "value": "500"
+      }
+    },
+    "result_sets": {},
+    "error": null,
+    "messages": [
+      "created order 1"
+    ],
+    "snapshot": {
+      "AUDIT_LOG": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ORDER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ACTION",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "OLD_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NEW_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "LOGGED_AT",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": []
+      },
+      "ORDERS": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "CUSTOMER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "AMOUNT",
+            "type": "NUMBER"
+          },
+          {
+            "name": "TAX",
+            "type": "NUMBER"
+          },
+          {
+            "name": "STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NOTE",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "ORDER_DATE",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": []
+      }
+    }
+  }
+}

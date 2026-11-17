@@ -1,0 +1,27 @@
+{
+  "case_id": "PKG_ORDER.FORMAT_NAME.005",
+  "case_hash": "sha256:79549bfb180294608001d22fca10d710661ecea57790f90c0e058ff613eae203",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "return": {
+      "type": "VARCHAR",
+      "value": "𠮷野 ﾀﾛｳ"
+    },
+    "out_args": {},
+    "result_sets": {},
+    "error": null
+  }
+}

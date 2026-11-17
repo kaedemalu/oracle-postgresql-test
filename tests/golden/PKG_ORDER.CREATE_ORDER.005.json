@@ -1,0 +1,100 @@
+{
+  "case_id": "PKG_ORDER.CREATE_ORDER.005",
+  "case_hash": "sha256:8333e6a53cd1c427d3036dc39594cdc6acf28d0c47285946b28b03b328bf7bf2",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "out_args": {},
+    "result_sets": {},
+    "error": {
+      "logical_name": "ERR_NOT_NULL",
+      "message": "cannot insert NULL into (\"APP\".\"ORDERS\".\"AMOUNT\")",
+      "native_code": "ORA-01400",
+      "native_message": "ORA-01400: cannot insert NULL into (\"APP\".\"ORDERS\".\"AMOUNT\")\nORA-06512: at \"APP.PKG_ORDER\", line 45\nORA-06512: at line 1\nHelp: https://docs.oracle.com/error-help/db/ora-01400/",
+      "context": {}
+    },
+    "messages": [],
+    "snapshot": {
+      "AUDIT_LOG": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ORDER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ACTION",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "OLD_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NEW_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "LOGGED_AT",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": []
+      },
+      "ORDERS": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "CUSTOMER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "AMOUNT",
+            "type": "NUMBER"
+          },
+          {
+            "name": "TAX",
+            "type": "NUMBER"
+          },
+          {
+            "name": "STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NOTE",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "ORDER_DATE",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": []
+      }
+    }
+  }
+}

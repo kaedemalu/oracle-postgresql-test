@@ -1,0 +1,12 @@
+# 承認済み仕様差(11.4)。id / scope / rule / reason / approved_by / approved_at は必須
+#   scope.case / scope.path は glob。path は差分パス(例: observed.snapshot.ORDERS[ID=1].AMOUNT)
+#   rule: ignore | {numeric_abs: 0.01} | {numeric_rel: 1e-9}
+#   expires: 期限(YYYY-MM-DD)。期限切れの許容差は適用されない
+tolerances: []
+#  - id: TOL-001
+#    scope: {case: "PKG_ORDER.*", path: "observed.error.message"}
+#    rule: ignore
+#    reason: DB 固有のエラーメッセージ文言差
+#    approved_by: (承認者)
+#    approved_at: 2026-11-20
+#    expires: null

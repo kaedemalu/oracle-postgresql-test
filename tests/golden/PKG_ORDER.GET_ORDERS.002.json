@@ -1,0 +1,42 @@
+{
+  "case_id": "PKG_ORDER.GET_ORDERS.002",
+  "case_hash": "sha256:41fcc1fd8f7d4c776abd0f47775a43ae7c1fef166b3bda368ef2c46ccf3a544e",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "out_args": {},
+    "result_sets": {
+      "P_CUR": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "AMOUNT",
+            "type": "NUMBER"
+          },
+          {
+            "name": "STATUS",
+            "type": "VARCHAR"
+          }
+        ],
+        "ordered": false,
+        "rows": []
+      }
+    },
+    "error": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "case_id": "PKG_ORDER.CALC_TAX.005",
+  "case_hash": "sha256:c1566135e59a7f3b9a6852de07f78210208c9513a7682c72d01473af781feb89",
+  "recorded_at": "2026-11-16T10:49:23Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "return": {
+      "type": null,
+      "value": null
+    },
+    "out_args": {},
+    "result_sets": {},
+    "error": {
+      "logical_name": "ERR_USER_20001",
+      "message": "amount must be >= 0",
+      "native_code": "ORA-20001",
+      "native_message": "ORA-20001: amount must be >= 0\nORA-06512: at \"APP.PKG_ORDER\", line 9\nORA-06512: at line 1",
+      "context": {}
+    }
+  }
+}

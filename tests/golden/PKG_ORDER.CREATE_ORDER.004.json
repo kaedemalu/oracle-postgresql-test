@@ -1,0 +1,100 @@
+{
+  "case_id": "PKG_ORDER.CREATE_ORDER.004",
+  "case_hash": "sha256:3a3b5cbaa648a70b2e8efb149dcb6b34dcc1c091e8279a2b9b22e68a263b66bc",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "out_args": {},
+    "result_sets": {},
+    "error": {
+      "logical_name": "ERR_USER_20001",
+      "message": "amount must be >= 0",
+      "native_code": "ORA-20001",
+      "native_message": "ORA-20001: amount must be >= 0\nORA-06512: at \"APP.PKG_ORDER\", line 9\nORA-06512: at \"APP.PKG_ORDER\", line 43\nORA-06512: at line 1",
+      "context": {}
+    },
+    "messages": [],
+    "snapshot": {
+      "AUDIT_LOG": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ORDER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "ACTION",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "OLD_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NEW_STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "LOGGED_AT",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": []
+      },
+      "ORDERS": {
+        "columns": [
+          {
+            "name": "ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "CUSTOMER_ID",
+            "type": "INTEGER"
+          },
+          {
+            "name": "AMOUNT",
+            "type": "NUMBER"
+          },
+          {
+            "name": "TAX",
+            "type": "NUMBER"
+          },
+          {
+            "name": "STATUS",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "NOTE",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "ORDER_DATE",
+            "type": "DATE"
+          }
+        ],
+        "key": [
+          "ID"
+        ],
+        "rows": []
+      }
+    }
+  }
+}

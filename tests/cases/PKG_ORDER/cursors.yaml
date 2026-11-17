@@ -1,0 +1,50 @@
+suite: PKG_ORDER
+defaults:
+  setup:
+    fixtures: [base_master]
+    rows:
+      - table: ORDERS
+        data:
+          - {ID: 1, CUSTOMER_ID: 1, AMOUNT: 1000, STATUS: NEW}
+          - {ID: 2, CUSTOMER_ID: 1, AMOUNT: 300, STATUS: SHIPPED}
+          - {ID: 3, CUSTOMER_ID: 2, AMOUNT: 1000, STATUS: NEW}
+          - {ID: 4, CUSTOMER_ID: 2, AMOUNT: "5000.50", STATUS: NEW}
+
+cases:
+  - id: PKG_ORDER.GET_ORDERS.001
+    title: OUT REFCURSOR(複数件・ORDER BY 保持)
+    tags: [cursor]
+    target: {kind: procedure, name: PKG_ORDER.GET_ORDERS}
+    observe: {ordered: true}
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 1}
+        - {name: P_CUR, type: REFCURSOR, mode: OUT}
+
+  - id: PKG_ORDER.GET_ORDERS.002
+    title: OUT REFCURSOR(0 件)
+    tags: [cursor, boundary]
+    target: {kind: procedure, name: PKG_ORDER.GET_ORDERS}
+    call:
+      args:
+        - {name: P_CUSTOMER_ID, type: INTEGER, value: 3}
+        - {name: P_CUR, type: REFCURSOR, mode: OUT}
+
+  - id: PKG_ORDER.TOP_ORDERS.001
+    title: 戻り値 REFCURSOR(ROWNUM → LIMIT、同額は ID 順)
+    tags: [cursor, dialect]
+    priority: high
+    target: {kind: function, name: PKG_ORDER.TOP_ORDERS}
+    observe: {ordered: true}
+    call:
+      args: [{name: P_N, type: NUMBER, value: 3}]
+      returns: {type: REFCURSOR}
+
+  - id: PKG_ORDER.TOP_ORDERS.002
+    title: 0 件指定
+    tags: [cursor, boundary]
+    target: {kind: function, name: PKG_ORDER.TOP_ORDERS}
+    observe: {ordered: true}
+    call:
+      args: [{name: P_N, type: NUMBER, value: 0}]
+      returns: {type: REFCURSOR}

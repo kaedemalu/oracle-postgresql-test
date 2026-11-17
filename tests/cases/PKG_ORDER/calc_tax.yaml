@@ -1,0 +1,53 @@
+suite: PKG_ORDER
+defaults:
+  target: {kind: function, name: PKG_ORDER.CALC_TAX}
+  call:
+    returns: {type: NUMBER}
+
+cases:
+  - id: PKG_ORDER.CALC_TAX.001
+    title: 通常の税計算
+    tags: [calc]
+    priority: high
+    call:
+      args: [{name: P_AMOUNT, type: NUMBER, value: 1000}]
+
+  - id: PKG_ORDER.CALC_TAX.002
+    title: 端数切り捨て
+    tags: [calc, boundary]
+    priority: high
+    call:
+      args: [{name: P_AMOUNT, type: NUMBER, value: "1234.56"}]
+
+  - id: PKG_ORDER.CALC_TAX.003
+    title: 0 円
+    tags: [calc, boundary]
+    call:
+      args: [{name: P_AMOUNT, type: NUMBER, value: 0}]
+
+  - id: PKG_ORDER.CALC_TAX.004
+    title: NULL は NULL を返す
+    tags: [calc, "null"]
+    call:
+      args: [{name: P_AMOUNT, type: NUMBER, value: null}]
+
+  - id: PKG_ORDER.CALC_TAX.005
+    title: 負数はユーザー定義例外 -20001
+    tags: [calc, error]
+    priority: high
+    call:
+      args: [{name: P_AMOUNT, type: NUMBER, value: -1}]
+    error: {compare: name_and_message}
+
+  - id: PKG_ORDER.CALC_TAX.006
+    title: SELECT 内呼び出し
+    tags: [calc]
+    target: {invoke_style: select}
+    call:
+      args: [{name: P_AMOUNT, type: NUMBER, value: 999}]
+
+  - id: PKG_ORDER.CALC_TAX.007
+    title: 大きな値(精度保持)
+    tags: [calc, boundary]
+    call:
+      args: [{name: P_AMOUNT, type: NUMBER, value: "9999999999.99"}]

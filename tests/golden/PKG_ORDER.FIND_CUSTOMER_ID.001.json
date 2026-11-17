@@ -1,0 +1,27 @@
+{
+  "case_id": "PKG_ORDER.FIND_CUSTOMER_ID.001",
+  "case_hash": "sha256:5fe7557f388747f60c52ff5ce3ab5d5dcd95c3856343edb83d42a7e4d6c521d2",
+  "recorded_at": "2026-11-16T10:49:25Z",
+  "source": {
+    "dialect": "oracle",
+    "version": "23.26.3.0.0",
+    "nls": {
+      "NLS_NUMERIC_CHARACTERS": ".,",
+      "NLS_DATE_FORMAT": "YYYY-MM-DD HH24:MI:SS",
+      "NLS_SORT": "BINARY",
+      "NLS_TIMESTAMP_FORMAT": "YYYY-MM-DD HH24:MI:SS.FF6",
+      "NLS_COMP": "BINARY",
+      "TIME_ZONE": "UTC",
+      "NLS_CHARACTERSET": "AL32UTF8"
+    }
+  },
+  "observed": {
+    "return": {
+      "type": "INTEGER",
+      "value": "1"
+    },
+    "out_args": {},
+    "result_sets": {},
+    "error": null
+  }
+}
