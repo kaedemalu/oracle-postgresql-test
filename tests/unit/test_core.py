@@ -9,6 +9,7 @@ from tests.core.errors import ErrorMapper
 from tests.core.loader import Catalog, Settings, case_hash, load_fixture
 from tests.core.models import CallResult, Case, ColumnMeta, Snapshot, TableData, Verdict
 from tests.core.normalize import Normalizer, norm_decimal, observe
+from tests.core.runner import check_golden_source
 
 
 @pytest.fixture(scope="module")
@@ -102,6 +103,51 @@ def test_error_mapper(catalog):
     assert m.postgres("23503", 'insert or update on table "orders" violates') == "ERR_FK_PARENT_MISSING"
     assert m.postgres("23503", 'update or delete on table "customers" violates') == "ERR_FK_CHILD_EXISTS"
     assert m.postgres("P0002", "") == "ERR_NO_DATA"
+
+
+@pytest.mark.parametrize("message,expected", [
+    ("ORA-06502: PL/SQL: numeric or value error: character string buffer too small", "ERR_VALUE_TOO_LARGE"),
+    ("ORA-06502: PL/SQL: numeric or value error: number precision too large", "ERR_NUMERIC_OVERFLOW"),
+    ("ORA-06502: PL/SQL: numeric or value error: character to number conversion error", "ERR_INVALID_NUMBER"),
+    ("ORA-06502: PL/SQL: numeric or value error", "ERR_INVALID_NUMBER"),
+])
+def test_error_mapper_oracle_message_regex(catalog, message, expected):
+    assert ErrorMapper(catalog.error_map).oracle("ORA-06502", message) == expected
+
+
+def test_char_map():
+    rules = {"string": {"char_map": {"\u301C": "\uFF5E"}}}
+    assert Normalizer(rules).value("a\u301Cb", "VARCHAR", "p") == "a\uFF5Eb"
+    assert Normalizer({"string": {"char_map": {"が": "X"}}}).value("か\u3099", "VARCHAR", "p") == "X"  # NFC 後に適用
+    assert Normalizer({}).value("a\u301Cb", "VARCHAR", "p") == "a\u301Cb"
+
+
+def test_build_plsql_call():
+    from tests.adapters.oracle import build_plsql_call
+    assert build_plsql_call("PKG.F", [("P_A", "IN", "NUMBER")], "NUMBER") == "BEGIN :ret := PKG.F(P_A => :b0); END;"
+    assert build_plsql_call("PKG.P", []) == "BEGIN PKG.P; END;"
+    stmt = build_plsql_call("PKG.F", [("P_A", "IN", "BOOLEAN"), ("P_B", "OUT", "BOOLEAN"),
+                                      ("P_C", "INOUT", "BOOLEAN"), ("P_D", "IN", "VARCHAR")], "BOOLEAN")
+    assert stmt == (
+        "DECLARE l_b0 BOOLEAN; l_b1 BOOLEAN; l_b2 BOOLEAN; l_ret BOOLEAN; BEGIN "
+        "l_b0 := CASE :b0 WHEN 1 THEN TRUE WHEN 0 THEN FALSE END; "
+        "l_b2 := CASE :b2 WHEN 1 THEN TRUE WHEN 0 THEN FALSE END; "
+        "l_ret := PKG.F(P_A => l_b0, P_B => l_b1, P_C => l_b2, P_D => :b3); "
+        ":b1 := CASE WHEN l_b1 THEN 1 WHEN NOT l_b1 THEN 0 END; "
+        ":b2 := CASE WHEN l_b2 THEN 1 WHEN NOT l_b2 THEN 0 END; "
+        ":ret := CASE WHEN l_ret THEN 1 WHEN NOT l_ret THEN 0 END; END;")
+    assert build_plsql_call("PKG.P", [("P_X", "IN", "BOOLEAN")]) == (
+        "DECLARE l_b0 BOOLEAN; BEGIN l_b0 := CASE :b0 WHEN 1 THEN TRUE WHEN 0 THEN FALSE END; "
+        "PKG.P(P_X => l_b0); END;")
+
+
+def test_check_golden_source():
+    src = {"version": "11.2.0.2.0", "nls": {"NLS_DATE_FORMAT": "RR-MM-DD"}}
+    assert check_golden_source(src, {}) is None
+    assert check_golden_source(src, {"version_prefix": "11.2", "nls": {"NLS_DATE_FORMAT": "RR-MM-DD"}}) is None
+    bad = check_golden_source({"version": "23.26.3.0.0", "nls": {}},
+                              {"version_prefix": "11.2", "nls": {"NLS_DATE_FORMAT": "RR-MM-DD"}})
+    assert "version='23.26.3.0.0'" in bad and "NLS_DATE_FORMAT" in bad
 
 
 def test_all_cases_valid_and_hash_stable(catalog):

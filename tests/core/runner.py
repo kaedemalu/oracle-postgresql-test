@@ -27,6 +27,19 @@ def make_adapter(dialect: str, catalog: Catalog):
     raise ValueError(f"unknown dialect: {dialect}")
 
 
+def check_golden_source(source: dict, expected: dict) -> str | None:
+    """ゴールデンの記録元(source)が想定(settings.golden_source)と一致するか。不一致なら理由を返す"""
+    problems = []
+    prefix = expected.get("version_prefix")
+    if prefix and not str(source.get("version", "")).startswith(str(prefix)):
+        problems.append(f"version={source.get('version')!r}(想定 {prefix}*)")
+    nls = source.get("nls") or {}
+    for k, v in (expected.get("nls") or {}).items():
+        if str(nls.get(k)) != str(v):
+            problems.append(f"{k}={nls.get(k)!r}(想定 {v!r})")
+    return ", ".join(problems) or None
+
+
 @dataclass
 class Execution:
     observed: dict
@@ -164,6 +177,10 @@ class Runner:
         golden = json.loads(path.read_text(encoding="utf-8"))
         if golden.get("case_hash") != case_hash(case, self.fixtures_dir):
             out.verdict, out.message = Verdict.ERROR, "ゴールデン陳腐化: ケース/フィクスチャが変更されています(再 record が必要)"
+            return
+        bad_source = check_golden_source(golden.get("source") or {}, self.catalog.settings.golden_source)
+        if bad_source:
+            out.verdict, out.message = Verdict.ERROR, f"ゴールデンの記録元が想定と異なる: {bad_source}(想定環境で再 record が必要)"
             return
         self._judge(case, out, golden["observed"], self.execute(case, dialect))
 

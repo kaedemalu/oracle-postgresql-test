@@ -70,6 +70,41 @@ def _desc_type(d) -> str:
     return _DESC_TYPES.get(d.type_code, str(d.type_code))
 
 
+def _arglist(args: list[tuple[str, str, str]], bool_locals: bool = False) -> str:
+    parts = [f"{_ident(n)} => {'l_' if bool_locals and base_type(t) == 'BOOLEAN' else ':'}b{i}"
+             for i, (n, _, t) in enumerate(args)]
+    return f"({', '.join(parts)})" if parts else ""
+
+
+def build_plsql_call(name: str, args: list[tuple[str, str, str]], ret_type: str | None = None) -> str:
+    """サブプログラム呼び出しの PL/SQL ブロックを生成する。引数は (名前, モード, 論理型)、バインド名は :b<i> / :ret。
+
+    PL/SQL の BOOLEAN はクライアントからバインドできない(11g)ため、BOOLEAN を含む場合は
+    ローカル変数 l_b<i> / l_ret を経由し、バインドは 1 / 0 / NULL の NUMBER でやり取りする。
+    """
+    bool_idx = [i for i, (_, _, t) in enumerate(args) if base_type(t) == "BOOLEAN"]
+    ret_bool = ret_type is not None and base_type(ret_type) == "BOOLEAN"
+    if not bool_idx and not ret_bool:
+        call = f"{name}{_arglist(args)}"
+        return f"BEGIN :ret := {call}; END;" if ret_type is not None else f"BEGIN {call}; END;"
+
+    def to_num(var: str) -> str:
+        return f"CASE WHEN {var} THEN 1 WHEN NOT {var} THEN 0 END"
+
+    decl = [f"l_b{i} BOOLEAN;" for i in bool_idx] + (["l_ret BOOLEAN;"] if ret_bool else [])
+    body = [f"l_b{i} := CASE :b{i} WHEN 1 THEN TRUE WHEN 0 THEN FALSE END;"
+            for i in bool_idx if args[i][1] in ("IN", "INOUT")]
+    call = f"{name}{_arglist(args, bool_locals=True)}"
+    if ret_type is None:
+        body.append(f"{call};")
+    else:
+        body.append(f"{'l_ret' if ret_bool else ':ret'} := {call};")
+    body += [f":b{i} := {to_num(f'l_b{i}')};" for i in bool_idx if args[i][1] in ("OUT", "INOUT")]
+    if ret_bool:
+        body.append(f":ret := {to_num('l_ret')};")
+    return f"DECLARE {' '.join(decl)} BEGIN {' '.join(body)} END;"
+
+
 class OracleAdapter(AdapterBase):
     dialect = "oracle"
     conn: oracledb.Connection
@@ -218,7 +253,7 @@ class OracleAdapter(AdapterBase):
         name = self.name(case.target.name)
         _ident(name)
         binds: dict[str, Any] = {}
-        parts, outs = [], []
+        outs = []
         for i, a in enumerate(case.call.args):
             b = f"b{i}"
             if a.mode == "IN":
@@ -229,20 +264,21 @@ class OracleAdapter(AdapterBase):
                     var.setvalue(0, self.coerce(a.value, a.type))
                 binds[b] = var
                 outs.append((a.name.upper(), var, a.type))
-            parts.append(f"{_ident(a.name)} => :{b}")
-        arglist = f"({', '.join(parts)})" if parts else ""
+        args = [(a.name, a.mode, a.type) for a in case.call.args]
 
         if case.target.kind == "function":
             rtype = case.call.returns.type
             if case.target.invoke_style == "select":
-                stmt = f"SELECT {name}{arglist} FROM DUAL"
+                if any(base_type(t) == "BOOLEAN" for t in (rtype, *(t for _, _, t in args))):
+                    raise ValueError("BOOLEAN の引数・戻り値を持つ関数は SQL から呼べない(invoke_style: block を使う)")
+                stmt = f"SELECT {name}{_arglist(args)} FROM DUAL"
                 self.log(stmt, binds)
                 cur.execute(stmt, binds)
                 value = cur.fetchone()[0]
             else:
                 rv = self._var(cur, rtype)
                 binds["ret"] = rv
-                stmt = f"BEGIN :ret := {name}{arglist}; END;"
+                stmt = build_plsql_call(name, args, rtype)
                 self.log(stmt, {k: v for k, v in binds.items() if k != "ret"})
                 cur.execute(stmt, binds)
                 value = rv.getvalue()
@@ -251,7 +287,7 @@ class OracleAdapter(AdapterBase):
             else:
                 res.return_value, res.return_type = self._read(value), rtype
         else:
-            stmt = f"BEGIN {name}{arglist}; END;"
+            stmt = build_plsql_call(name, args)
             self.log(stmt, binds)
             cur.execute(stmt, binds)
 

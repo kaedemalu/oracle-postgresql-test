@@ -67,6 +67,11 @@ class Settings:
     def reset(self) -> dict:
         return self.raw.get("reset") or {"tables": [], "sequences": {}}
 
+    @property
+    def golden_source(self) -> dict:
+        """ゴールデンの記録元として想定する Oracle(version_prefix / nls)。空ならチェックしない"""
+        return self.raw.get("golden_source") or {}
+
     def clock_sql(self, dialect: str) -> str | None:
         return (self.raw.get("clock") or {}).get(dialect)
 
