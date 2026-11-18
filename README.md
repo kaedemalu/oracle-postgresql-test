@@ -139,9 +139,9 @@ cases:
 
 | ファイル | 内容 | 主なキー |
 | --- | --- | --- |
-| `settings.yaml` | 接続先と実行時の動作 | `databases.<db>`(接続先・セッション固定パラメータ。`${ENV:-既定値}` で環境変数を展開する)、`allowed_hosts`(ここに無いホストには接続しない)、`naming` / `name_mapping`(名前解決)、`clock`(時刻注入に使う SQL)、`reset`(各ケースの前に削除するテーブルを子→親の順で並べたものと、シーケンスの初期値)、`deploy`、`paths` |
-| `error_map.yaml` | 例外の対応表 | `errors[]`: `{name, oracle: [ORA-xxxxx], postgres: [SQLSTATE または {code, message_regex}]}`(多対一も可)。`user_errors`: ユーザー定義例外の番号の対応規約。表に無いエラーは `ERR_UNMAPPED` となり `ERROR` になる |
-| `normalize.yaml` | 正規化ルール | `string`(NFC 正規化 / 改行の統一 / CHAR 型の末尾空白除去)、`empty_string_as_null`、`datetime.precision`(`second` / `microsecond`)、`boolean`(真偽値とみなす値のリスト)、`float.digits`、`columns[]`(列単位の上書き。`{table, column}` は glob で指定し、`mask` または `type` を設定する) |
+| `settings.yaml` | 接続先と実行時の動作 | `databases.<db>`(接続先・セッション固定パラメータ。`${ENV:-既定値}` で環境変数を展開する)、`allowed_hosts`(ここに無いホストには接続しない)、`naming` / `name_mapping`(名前解決)、`clock`(時刻注入に使う SQL)、`reset`(各ケースの前に削除するテーブルを子→親の順で並べたものと、シーケンスの初期値)、`golden_source`(ゴールデンの記録元として想定する `version_prefix` と `nls`。指定すると `verify` / `check-oracle` で一致を確認し、不一致は `ERROR`)、`deploy`、`paths` |
+| `error_map.yaml` | 例外の対応表 | `errors[]`: `{name, oracle: [ORA-xxxxx または {code, message_regex}], postgres: [SQLSTATE または {code, message_regex}]}`(多対一も可。上から順に評価し、最初に一致したものを採用。ORA-06502 は本文で振り分けている)。`user_errors`: ユーザー定義例外の番号の対応規約。表に無いエラーは `ERR_UNMAPPED` となり `ERROR` になる |
+| `normalize.yaml` | 正規化ルール | `string`(NFC 正規化 / `char_map` による文字の読み替え(波ダッシュ等)/ 改行の統一 / CHAR 型の末尾空白除去)、`empty_string_as_null`、`datetime.precision`(`second` / `microsecond`)、`boolean`(真偽値とみなす値のリスト)、`float.digits`、`columns[]`(列単位の上書き。`{table, column}` は glob で指定し、`mask` または `type` を設定する) |
 | `tolerances.yaml` | 承認済みの仕様差 | `tolerances[]`: `{id, scope: {case, path}, rule, reason, approved_by, approved_at, expires}`。`rule` は `ignore` / `{numeric_abs: n}` / `{numeric_rel: n}`。必須項目が欠けているとテストを開始しない。期限切れのものは適用しない |
 
 `scope.path` には、レポートに表示される差分パスを glob で書く(例: `observed.snapshot.ORDERS*.AMOUNT`、`observed.error.message`)。
@@ -157,7 +157,7 @@ cases:
 | 3 | パッケージ変換方式 | スキーマ方式(`PKG_ORDER.CALC_TAX` → `pkg_order.calc_tax`) | `settings.yaml` の `naming` / `name_mapping` |
 | 6 | 時刻固定 | ラッパ関数差し替え(Oracle: `APP_CLOCK` パッケージ変数、PG: `app.fixed_clock` セッション変数) | `settings.yaml` の `clock` |
 | 7 | ユーザー定義例外 | `RAISE_APPLICATION_ERROR(-20nnn)` ⇔ `ERRCODE 'U0nnn'`。`P0001` + メッセージ先頭 `[20nnn]` も可 | `error_map.yaml` の `user_errors` |
-| — | BOOLEAN | Oracle には 1/0 で渡す | `adapters/oracle.py` の `bool_value` |
+| — | BOOLEAN | Oracle には 1/0 で渡す。PL/SQL の BOOLEAN 引数・戻り値はローカル変数経由の DECLARE ブロックで 1/0 に変換する(`invoke_style: select` は不可) | `adapters/oracle.py` の `bool_value` / `build_plsql_call` |
 | — | リセット | TRUNCATE ではなく DELETE(Oracle は FK 参照される親を TRUNCATE できないため) | `settings.yaml` の `reset` |
 
 ## 未実装・制約

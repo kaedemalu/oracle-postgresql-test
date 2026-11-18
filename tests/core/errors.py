@@ -16,8 +16,9 @@ class ErrorMapper:
         if m and self.user_range[0] <= int(m.group(1)) <= self.user_range[1]:
             return f"ERR_USER_{int(m.group(1))}"
         for r in self.rules:
-            if native_code in (r.get("oracle") or []):
-                return r["name"]
+            for entry in r.get("oracle") or []:
+                if _match(entry, native_code, message):
+                    return r["name"]
         return f"ERR_UNMAPPED:{native_code}"
 
     def postgres(self, sqlstate: str, message: str) -> str:
@@ -35,9 +36,13 @@ class ErrorMapper:
             return f"ERR_USER_{int(number)}"
         for r in self.rules:
             for entry in r.get("postgres") or []:
-                if isinstance(entry, dict):
-                    if entry["code"] == sqlstate and re.search(entry.get("message_regex", ""), message or ""):
-                        return r["name"]
-                elif str(entry) == sqlstate:
+                if _match(entry, sqlstate, message):
                     return r["name"]
         return f"ERR_UNMAPPED:{sqlstate}"
+
+
+def _match(entry: str | dict, code: str, message: str) -> bool:
+    """対応表の 1 要素(コード文字列 or {code, message_regex})との一致判定"""
+    if isinstance(entry, dict):
+        return entry["code"] == code and bool(re.search(entry.get("message_regex", ""), message or ""))
+    return str(entry) == code

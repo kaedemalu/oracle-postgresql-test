@@ -3,6 +3,15 @@ string:
   nfc: true              # Unicode NFC 正規化
   unify_newlines: true   # \r\n / \r → \n
   rstrip_char: true      # CHAR 型の末尾パディング除去
+  # 文字の読み替え(NFC の直後に両 DB の値へ適用)。SJIS 系の移行元と UTF-8 の変換表の差を吸収する。
+  # データ移行で採用した変換表に合わせて有効化すること
+  char_map: {}
+  #  "〜": "～"   # 〜 WAVE DASH → ～ FULLWIDTH TILDE
+  #  "−": "－"   # − MINUS SIGN → － FULLWIDTH HYPHEN-MINUS
+  #  "‖": "∥"   # ‖ DOUBLE VERTICAL LINE → ∥ PARALLEL TO
+  #  "¢": "￠"   # ¢ → ￠
+  #  "£": "￡"   # £ → ￡
+  #  "¬": "￢"   # ¬ → ￢
 empty_string_as_null: true   # '' と NULL を同一視(5.7)。ケースの strict_empty で上書き
 datetime:
   precision: second      # second / microsecond

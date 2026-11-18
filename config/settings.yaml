@@ -43,6 +43,14 @@ name_mapping: {}
 #    oracle: PKG_ORDER.CALC_TAX
 #    postgres: pkg_order.calc_tax
 
+# ゴールデンの記録元チェック(付録 A.1)。指定すると verify / check-oracle で
+# ゴールデンの source.version(前方一致)と source.nls(指定キーのみ)を確認し、不一致は ERROR にする
+golden_source: {}
+#  version_prefix: "11.2"
+#  nls:
+#    NLS_DATE_FORMAT: "RR-MM-DD"
+#    NLS_CHARACTERSET: JA16SJISTDC
+
 # 時刻注入(5.6)。採用方式: ラッパ関数差し替え
 clock:
   oracle: "BEGIN APP_CLOCK.SET_FIXED(:ts); END;"

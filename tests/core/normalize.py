@@ -40,6 +40,7 @@ class Normalizer:
         self.nfc = s.get("nfc", True)
         self.unify_newlines = s.get("unify_newlines", True)
         self.rstrip_char = s.get("rstrip_char", True)
+        self.char_map = str.maketrans(s.get("char_map") or {})
         self.empty_as_null = self.rules.get("empty_string_as_null", True) and not strict_empty
         dtr = self.rules.get("datetime", {})
         self.dt_precision = dtr.get("precision", "second")
@@ -89,6 +90,8 @@ class Normalizer:
     def _string(self, s: str, t: str | None, path: str) -> str | None:
         if self.nfc:
             s = unicodedata.normalize("NFC", s)
+        if self.char_map:
+            s = s.translate(self.char_map)
         if self.unify_newlines:
             s = s.replace("\r\n", "\n").replace("\r", "\n")
         if t == "CHAR" and self.rstrip_char:

@@ -1,5 +1,13 @@
-# 例外対応表(10章)。多対一可。postgres 側は code に加え message_regex で判別できる
+# 例外対応表(10章)。多対一可。oracle / postgres とも code に加え message_regex で判別できる
+# 上から順に評価し、最初に一致したものを採用する
 errors:
+  # ORA-06502 は「数値または値のエラー」の総称のため本文で振り分ける(該当しないものは ERR_INVALID_NUMBER)
+  - name: ERR_VALUE_TOO_LARGE
+    oracle: [{code: ORA-06502, message_regex: "character string buffer too small"}]
+    postgres: []
+  - name: ERR_NUMERIC_OVERFLOW
+    oracle: [{code: ORA-06502, message_regex: "number precision too large"}]
+    postgres: []
   - {name: ERR_NO_DATA,           oracle: [ORA-01403], postgres: [P0002]}
   - {name: ERR_TOO_MANY_ROWS,     oracle: [ORA-01422], postgres: [P0003]}
   - {name: ERR_UNIQUE,            oracle: [ORA-00001], postgres: ["23505"]}
